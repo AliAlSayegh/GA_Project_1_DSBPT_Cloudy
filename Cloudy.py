@@ -1,6 +1,38 @@
 import csv
 import uuid
+import random
+import pandas as pd
 from datetime import date, datetime, timedelta
+
+# # Weather conditions list
+# conditions = ["sunny", "cloudy", "rainy", "stormy", "foggy", "snowy", "windy"]
+
+# # Open CSV file
+# with open("Cloudy.csv", "w", newline="") as file:
+#     writer = csv.writer(file)
+    
+#     # Write header
+#     writer.writerow(["id", "date", "temperature", "condition", "humidity", "wind_speed"])
+    
+#     # Date range: from today back 2 years
+#     today = datetime.now()
+#     start_date = today - timedelta(days=730)  # approx 2 years
+    
+#     # Generate 20 records
+#     for _ in range(730):
+#         record_id = uuid.uuid4().hex[:8]  # 8-char unique id
+#         # Random date in the last 2 years
+#         date = (start_date + timedelta(days=random.randint(0, 730))).strftime("%d-%m-%Y")
+        
+#         # Weather values
+#         temperature = round(random.uniform(-5, 45), 1)   # realistic temp range
+#         condition = random.choice(conditions)
+#         humidity = random.randint(20, 100)              # %
+#         wind_speed = round(random.uniform(0, 50), 1)    # km/h
+        
+#         # Write row
+#         writer.writerow([record_id, date, temperature, condition, humidity, wind_speed])
+
 
 def add_observation():
     """To add new weather observation to cloudy csv file"""
@@ -91,9 +123,6 @@ def add_observation():
                 print("Wind speed cannot be negative.")
         except ValueError:
             print("Please enter a valid number.")
-
-
-
             
     # To Create new observation
     new_observation = {
@@ -118,7 +147,7 @@ def add_observation():
 
 def filter_by_date():
     """Display the Weather information for sepesific date."""
-
+    print("\n=== Filter Weather Observations by Date ===")
     # Validate the observation date
     while True:
         selected_date = input("Enter the date in (MM-DD-YYYY) format, or press Enter for today date: ")
@@ -149,5 +178,51 @@ def filter_by_date():
     except FileNotFoundError:
         print("File 'Cloudy.csv' not found! ;( Please make sure the file exists.")
 
-filter_by_date()
 
+def  Open_csv():
+    """To open and read the cloudy csv file""" 
+    try:
+        with open('Cloudy.csv', 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            matches = [row for row in reader]
+
+            if matches:
+                return matches
+            else:
+                print(f"No data found in the file")
+    except FileNotFoundError:
+        print("File 'Cloudy.csv' not found! ;( Please make sure the file exists.")
+
+new_observation = Open_csv()
+
+# Function for Temperature Statistics
+def display_weather_stats(observation):
+    temperatures = [float(i['temperature']) for i in observation]  # Convert to float
+    weather_conditions = [i['condition'] for i in observation]  # Use correct key
+
+    # Get Maximum, Minimum, Average, and Mode (Most Frequent) in Variables
+    mode_weather = pd.Series(weather_conditions).mode()[0]
+    highest_degree = max(temperatures)
+    lowest_degree = min(temperatures)
+    average_degree = round(sum(temperatures) / len(temperatures), 2)
+
+    # Display to the user
+    while True:
+        choice = input("Choose what to display: Minimum, Maximum, Average, Most Common Weather or Exit: ")
+        try:
+            if choice.lower() == 'minimum':
+                print(f"The lowest degree is {lowest_degree}")
+            elif choice.lower() == 'maximum':
+                print(f"The highest degree is {highest_degree}")
+            elif choice.lower() == 'average':
+                print(f"The Average degree is {average_degree}")
+            elif choice.lower() == 'most common weather':
+                print(f"The most common weather is {mode_weather}")
+            elif choice.lower() == 'exit':
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Please choose Minimum, Maximum, Average, Most Common Weather, or Exit.")
+
+display_weather_stats(new_observation)
