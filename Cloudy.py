@@ -643,14 +643,197 @@ def predict_weather_tomorrow():
         print(f"Error: {e}")
 
 # ------------------------------------------------------------------------------------------
+def view_all_observations():
+    df = pd.read_csv("Cloudy.csv")
 
-predict_weather_tomorrow()
+    start = 0   # starting index of the partion
+    total_rows = len(df)    # Length of the whole csv file
+    page_size = 7  # Number of rows to display at a time (partion length)
+
+    while start < total_rows:
+        # Display first partion of the data
+        end = min(start + page_size, total_rows) # to avoid going out of index
+        print(df.iloc[start:end]) # display rows from start to end-1 using pandas iloc
+
+        # If we already showed all rows → break
+        if end >= total_rows:
+            print("\n--- End of data ---")
+            break
+
+        # Ask user what to do
+        choice = input("\nType 'continue' to see more, or 'full' to see all, or anything else to exit: ").strip().lower()
+
+        if choice == "continue":
+            start += page_size
+        elif choice == "full":
+            print(df.to_string())  # show full table
+            break
+        else: # any other input
+            print("Stopped.")
+            break
+
+def text_based_graph(page_size=7):
+    try:
+        with open('Cloudy.csv', 'r', newline='') as file:
+            reader = list(csv.DictReader(file))  # convert to list for pagination
+
+        if not reader:
+            print("No data available in 'Cloudy.csv'.")
+            return
+
+        # Extract temperatures for scaling
+        temperatures = [float(row['temperature']) for row in reader]
+        max_temp = max(temperatures)
+        min_temp = min(temperatures)
+        range_temp = max_temp - min_temp
+
+        print("\n=== Temperature Graph ===")
+
+        start = 0
+        total_rows = len(reader)
+
+        while start < total_rows:
+            end = min(start + page_size, total_rows)
+
+            for row in reader[start:end]:
+                temp = float(row['temperature'])
+                date = row['date']
+
+                # Scale number of stars
+                if range_temp == 0:
+                    num_stars = 50
+                else:
+                    num_stars = int(((temp - min_temp) / range_temp) * 50)
+
+                print(f"{date} | {temp:6.1f} °C | {'*' * num_stars}")
+
+            if end >= total_rows:
+                print("\n--- End of data ---")
+                break
+
+            # Ask user for navigation
+            choice = input("\nType 'continue' to see more, or 'full' to see all, or anything else to exit: ").strip().lower()
+
+            if choice == "continue":
+                start += page_size
+            elif choice == "full":
+                for row in reader[end:]:
+                    temp = float(row['temperature'])
+                    date = row['date']
+                    if range_temp == 0:
+                        num_stars = 50
+                    else:
+                        num_stars = int(((temp - min_temp) / range_temp) * 50)
+                    print(f"{date} | {temp:6.1f} °C | {'*' * num_stars}")
+                print("\n--- End of data ---")
+                break
+            else:
+                print("Stopped.")
+                break
+
+    except FileNotFoundError:
+        print("File 'Cloudy.csv' not found!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def function1():
+    try:
+        with open('Cloudy.csv', mode='r') as file:
+            reader = csv.reader(file)
+    except: 
+        with open('Cloudy.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)                                                   
+            writer.writerow(['id', 'temperature', 'weather_condition', 'humidity','wind_speed'])      
+            print("Created new Cloudy.csv file with the header row.")
+
+    print(''' 
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣤⠤⢀⠀⠀⠀⠀⠀⠀⠐⠒⠒⠒⠶⠮⣅⣿⠛⠶⠖⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⢀⢰⢈⣹⠓⣾⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣨⠀⢠⠐⣪⣭⣅⢤⣿⠞⠳⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣟⣶⢃⡃⠟⠓⡁⣫⡄⡀⠐⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⡰⢫⣟⠿⠧⣿⣿⣥⠴⣴⣮⣏⡣⣄⣲⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣰⣽⡵⢡⠤⠀⠈⢿⣷⠆⢚⡋⡁⢤⣿⡿⠁⠀⠀⠀⠀⢀⡤⠊⠉⠉⠙⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⣠⣤⠖⠶⡟⡧⢿⠀⠀⠀⠀⠀⠛⠶⣾⣷⡶⠟⠛⠉⢣⠀⣀⣀⣀⡜⠁⠀⠀⣠⠏⠁⠀⠀⢹⡠⠤⣄⣄⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⡜⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⣇⡀⢅⠀⠀⠀⠀
+⠀⠀⠁⠩⠵⠴⠲⠔⠶⠶⠶⠦⠴⠶⠶⠶⠖⠦⠤⢴⠏⠀⡴⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡏⡧⡀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡀⠀⠀⣀⣀⣀⢀⣀⠀⠀⠀⠀⠀⠀⣀⣀⠤⠞⠁⠀⡜⢸⡏⠀⢸⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠽⠕⠋⠘⠓⠒⠲⠤⠤⠤⡖⣛⠴⠶⡲⠮⠭⢶⣭⠦⠤⠎⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢠⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⡀
+⠀⠀⠀⢀⣀⣔⡽⣧⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠴⠢⠤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠁⠀⠀⠉⢆
+⠀⠀⠉⠉⠉⠻⡏⡗⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡔⣝⢏⠁⠀⠀⠀⢀⣉⣀⣀⡀⡄⠀⠀⢠⠴⠗⠗⠒⠒⠺⠋⠛⠉⠀
+⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⢉⡩⠟⣓⡿⠁⠀⠀⡖⠁⠀⠀⠀⠀⠀⠉⠳⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⣒⢯⢕⣫⡯⠗⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡗⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⡜⢛⣿⡇⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠁⠉⠛⠛⠉⠉⠉⠉⠁⠉⠁⠁⠁⠉⠉⠉⠒⠉⠁⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ''')
+    print("  Welcome to Cloudy!")
+    print("An amazing weather app that provides accurate weather forecasts! ")
+    print("*1"*35)
+    print("Please select the number of the option you would like to choose:")
+    print('''
+1. Record a new weather observation
+2. View weather statistics
+3. Search observations by date
+4. View all observations
+5. View statistics for a specific year
+6. predict weather tomorrow
+7. check temprature statistics in text based graph
+8. Exit the program and enjoy the weather!
+''')
+    
+    while(True):
+        option = input("Enter your choice (1-8): ")
+        option = option.strip()
+        while True:
+            if  option not in ['1', '2', '3', '4', '5','6','7','8']:
+                print("Invalid input. Please enter a number between 1 and 5.")
+                option = input("Enter your choice (1-5): ")
+                option = option.strip()
+            break     
+        if option == '1':
+            print("You have chosen to record a new weather observation.")
+            add_observation()
+        elif option == '2':
+            print("You have chosen to view weather statistics.")
+            new_observation = Open_csv()
+            display_weather_stats(new_observation)
+        elif option == '3':
+            print("You have chosen to search observations by date.")
+            filter_by_date()
+        elif option == '4':
+            print("You have chosen to view all observations.")
+            view_all_observations()
+        elif option == '5':
+            print("You have chosen to view statistics for a specific year.")
+            ask_year()
+        elif option == '6':
+            print("You have chosen predict weather.")
+            predict_weather_tomorrow()
+        elif option == '7':
+            print("You have chosen to temprature statistics in text based grapgh.")
+            text_based_graph()
+        if (option=='8'):
+            print("Exiting the program. Enjoy the weather!")
+            exit()
+        print("-"*35)
+        print("Please select the number of the option you would like to choose:")
+ 
+
+
+function1()
+
+# view_all_observations()
+# predict_weather_tomorrow()
 # add_observation()
 # filter_by_date()
 # ask_year()
-# new_observation = Open_csv()
+
 # display_weather_stats(new_observation)
 # Open_csv()
 # generate_weather_csv(out_path="cloudy.csv",
-#                          start_date="2020-09-03",
-#                          end_date="2025-09-05")
+#                          start_date="2022-01-01",
+#                          end_date="2025-09-06")
