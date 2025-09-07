@@ -774,7 +774,19 @@ def function1():
     print("An amazing weather app that provides accurate weather forecasts! ")
     print("*1"*35)
     print("Please select the number of the option you would like to choose:")
-    print('''
+#     print('''
+# 1. Record a new weather observation
+# 2. View weather statistics
+# 3. Search observations by date
+# 4. View all observations
+# 5. View statistics for a specific year
+# 6. predict weather tomorrow
+# 7. check temprature statistics in text based graph
+# 8. Exit the program and enjoy the weather!
+# ''')
+    
+    while(True):
+        option = input('''
 1. Record a new weather observation
 2. View weather statistics
 3. Search observations by date
@@ -783,10 +795,9 @@ def function1():
 6. predict weather tomorrow
 7. check temprature statistics in text based graph
 8. Exit the program and enjoy the weather!
-''')
-    
-    while(True):
-        option = input("Enter your choice (1-8): ")
+                       Enter your choice (1-8): 
+'''
+        )
         option = option.strip()
         while True:
             if  option not in ['1', '2', '3', '4', '5','6','7','8']:
